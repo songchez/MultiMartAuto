@@ -1,92 +1,48 @@
 import requests
-
+from api.api_endpoints import NAVER_API_BASE_URL, API_ENDPOINTS
 
 class APIHandler:
-    def __init__(self, platform, auth_info):
+    def __init__(self, access_token):
         """
-        Initialize APIHandler for a specific platform.
-        :param platform: Platform name (e.g., 'naver', 'coupang', 'cafe24').
-        :param auth_info: Authentication information for the platform.
+        Initialize APIHandler.
+        :param access_token: OAuth 2.0 access token.
         """
-        self.platform = platform.lower()
-        self.auth_info = auth_info
-        self.base_url = self.get_base_url()
+        self.access_token = access_token
 
-    def get_base_url(self):
+    def send_request(self, method, endpoint_key, data=None, query_params=None):
+            """
+            Send an HTTP request to the API.
+            :param method: HTTP method (e.g., 'GET', 'POST').
+            :param endpoint_key: Key to lookup endpoint in API_ENDPOINTS.
+            :param data: Request payload.
+            :param query_params: Query parameters for the request.
+            :return: Response JSON or error message.
+            """
+            if endpoint_key not in API_ENDPOINTS:
+                return {"error": f"Invalid endpoint key: {endpoint_key}"}
+
+            endpoint = API_ENDPOINTS[endpoint_key]
+            url = f"{NAVER_API_BASE_URL}{endpoint}"
+            headers = {
+                "Authorization": f"Bearer {self.access_token}",
+                "Content-Type": "application/json"
+            }
+
+            try:
+                response = requests.request(method, url, headers=headers, json=data, params=query_params)
+
+                if response.status_code == 200:
+                    return response.json()
+                else:
+                    print(f"Error: {response.status_code} - {response.reason}")
+                    print(f"Details: {response.text}")
+                    return {"error": response.reason}
+            except requests.exceptions.RequestException as e:
+                print(f"Request failed: {e}")
+                return {"error": str(e)}
+    def list_categories(self):
         """
-        Retrieve the base URL for the platform's API.
+        Fetch categories from the API.
+        :return: List of categories.
         """
-        if self.platform == 'naver':
-            return "https://api.naver.com"
-        elif self.platform == 'coupang':
-            return "https://api-gateway.coupang.com"
-        elif self.platform == 'cafe24':
-            return "https://api.cafe24.com"
-        else:
-            raise ValueError(f"Unsupported platform: {self.platform}")
-
-    def update_product(self, product_id, product_data):
-        """
-        Update a product on the platform.
-        :param product_id: ID of the product to update.
-        :param product_data: Dictionary containing updated product details.
-        :return: API response as JSON.
-        """
-        if self.platform == 'naver':
-            return self._update_product_naver(product_id, product_data)
-        elif self.platform == 'coupang':
-            return self._update_product_coupang(product_id, product_data)
-        elif self.platform == 'cafe24':
-            return self._update_product_cafe24(product_id, product_data)
-
-    def delete_product(self, product_id):
-        """
-        Delete a product on the platform.
-        :param product_id: ID of the product to delete.
-        :return: API response as JSON.
-        """
-        if self.platform == 'naver':
-            return self._delete_product_naver(product_id)
-        elif self.platform == 'coupang':
-            return self._delete_product_coupang(product_id)
-        elif self.platform == 'cafe24':
-            return self._delete_product_cafe24(product_id)
-
-    # Private methods for Naver
-    def _update_product_naver(self, product_id, product_data):
-        url = f"{self.base_url}/product/{product_id}"
-        headers = {"Authorization": f"Bearer {self.auth_info['token']}"}
-        response = requests.put(url, headers=headers, json=product_data)
-        return response.json()
-
-    def _delete_product_naver(self, product_id):
-        url = f"{self.base_url}/product/{product_id}"
-        headers = {"Authorization": f"Bearer {self.auth_info['token']}"}
-        response = requests.delete(url, headers=headers)
-        return response.json()
-
-    # Private methods for Coupang
-    def _update_product_coupang(self, product_id, product_data):
-        url = f"{self.base_url}/v2/providers/seller_api/apis/api/v1/marketplace/seller-products/{product_id}"
-        headers = {"Authorization": f"Bearer {self.auth_info['token']}"}
-        response = requests.put(url, headers=headers, json=product_data)
-        return response.json()
-
-    def _delete_product_coupang(self, product_id):
-        url = f"{self.base_url}/v2/providers/seller_api/apis/api/v1/marketplace/seller-products/{product_id}"
-        headers = {"Authorization": f"Bearer {self.auth_info['token']}"}
-        response = requests.delete(url, headers=headers)
-        return response.json()
-
-    # Private methods for Cafe24
-    def _update_product_cafe24(self, product_id, product_data):
-        url = f"{self.base_url}/api/v2/admin/products/{product_id}"
-        headers = {"Authorization": f"Bearer {self.auth_info['access_token']}"}
-        response = requests.put(url, headers=headers, json=product_data)
-        return response.json()
-
-    def _delete_product_cafe24(self, product_id):
-        url = f"{self.base_url}/api/v2/admin/products/{product_id}"
-        headers = {"Authorization": f"Bearer {self.auth_info['access_token']}"}
-        response = requests.delete(url, headers=headers)
-        return response.json()
+        return self.send_request("GET", "categories")

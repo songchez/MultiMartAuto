@@ -1,7 +1,7 @@
 import logging
 
 class Logger:
-    def __init__(self, log_file='../logs/app.log'):
+    def __init__(self, log_file='logs/app.log'):
         """
         Initialize the Logger.
         :param log_file: Path to the log file.
