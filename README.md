@@ -41,6 +41,7 @@ streamlit run home.py
 
 ## 프로젝트 구조
 
+```SCSS
 MultiMartAuto/
 ├── api/
 │ ├── api_handler.py # API 요청 처리
@@ -55,6 +56,7 @@ MultiMartAuto/
 ├── product_registration.py # 상품 등록 페이지
 ├── product_listing.py # 상품 목록 페이지
 └── requirements.txt # 의존성 패키지
+```
 
 ## 사용 방법
 
