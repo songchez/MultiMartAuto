@@ -11,9 +11,9 @@ API_ENDPOINTS = {
     "product_brands": "/v1/product-brands",
     "categories": "/v1/categories",
     "product_origin_areas": "/v1/product-origin-areas",
-    "upload_product_images": "/v1/product-images/upload",
+    "upload_product_images": "/v1/product-images/upload", #상품이미지등록
     "product_inspections": "/v1/product-inspections/channel-products",
-    "products": "/v2/products",
+    "products": "/v2/products", #상품등록
     "product_sizes": "/v1/product-sizes",
-    "products_search": "/v1/products/search"
+    "products_search": "/v1/products/search" #상품목록
 }
