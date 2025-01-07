@@ -65,48 +65,48 @@ with st.form("product_form"):
 
     # 상품요약정보필드(옵션)
     # snake_case를 camelCase로 변환하는 함수
-def snake_to_camel(snake_str):
-    components = snake_str.split('_')
-    return components[0].lower() + ''.join(x.title() for x in components[1:])
+    def snake_to_camel(snake_str):
+        components = snake_str.split('_')
+        return components[0].lower() + ''.join(x.title() for x in components[1:])
 
-# 상품요약정보필드(옵션)
-selected_option = st.selectbox(
-    "카테고리를 선택하세요:",
-    options=list(summary_info_options.keys()),
-    format_func=lambda x: summary_info_options[x]['label']
-)
+    # 상품요약정보필드(옵션)
+    selected_option = st.selectbox(
+        "카테고리를 선택하세요:",
+        options=list(summary_info_options.keys()),
+        format_func=lambda x: summary_info_options[x]['label']
+    )
 
-product_info_summary_payload = {}
+    product_info_summary_payload = {}
 
-# 상품요약정보필드(필드표시)
-if selected_option:
-    st.subheader(f"선택한 유형: {summary_info_options[selected_option]['label']}")
-    fields = summary_info_options[selected_option]["fields"]
-    
-    # camelCase로 변환된 필드 키
-    camel_case_option = snake_to_camel(selected_option)
-    product_info_summary = {}
+    # 상품요약정보필드(필드표시)
+    if selected_option:
+        st.subheader(f"선택한 유형: {summary_info_options[selected_option]['label']}")
+        fields = summary_info_options[selected_option]["fields"]
+        
+        # camelCase로 변환된 필드 키
+        camel_case_option = snake_to_camel(selected_option)
+        product_info_summary = {}
 
-    for field_key, field_description in fields.items():
-        # Check if the field has options (for radio button)
-        if isinstance(field_description, dict) and "options" in field_description:
-            options = field_description["options"]
-            selected_value = st.radio(
-                field_description["label"],
-                options=list(options.keys()),
-                format_func=lambda x: options[x]
-            )
-            product_info_summary[field_key] = selected_value
-        else:
-            # Use text input for simple fields
-            input_value = st.text_input(field_description, key=field_key)
-            if input_value:
-                product_info_summary[field_key] = input_value
+        for field_key, field_description in fields.items():
+            # Check if the field has options (for radio button)
+            if isinstance(field_description, dict) and "options" in field_description:
+                options = field_description["options"]
+                selected_value = st.radio(
+                    field_description["label"],
+                    options=list(options.keys()),
+                    format_func=lambda x, opt=options: opt[x]
+                )
+                product_info_summary[field_key] = selected_value
+            else:
+                # Use text input for simple fields
+                input_value = st.text_input(field_description, key=field_key)
+                if input_value:
+                    product_info_summary[field_key] = input_value
 
-    # productInfoProvidedNoticeType 추가
-    product_info_summary_payload["productInfoProvidedNoticeType"] = summary_info_options[selected_option]["label"]
-    # 카테고리를 camelCase 키로 추가
-    product_info_summary_payload[camel_case_option] = product_info_summary
+        # productInfoProvidedNoticeType 추가
+        product_info_summary_payload["productInfoProvidedNoticeType"] = summary_info_options[selected_option]
+        # 카테고리를 camelCase 키로 추가
+        product_info_summary_payload[camel_case_option] = product_info_summary
     
     outbound_location_id = st.text_input("판매자 창고 ID (선택)", help="상품을 출고할 창고 ID를 입력하세요.")
     after_service_phone_number = st.text_input("A/S(고객센터) 전화번호 (필수)", help="고객센터 전화번호")
@@ -178,23 +178,26 @@ if selected_option:
                     "manufacturerName":brand_name,
                     "brandName":brand_name
                 },
-            },
-            "afterServiceInfo":{
+                "afterServiceInfo":{
                 "afterServiceTelephoneNumber": after_service_phone_number,
                 "afterServiceGuideContent": after_service_guide_content
+                },
+                "originAreaInfo" : {
+                    "originAreaCode": "02",
+                    "importer": brand_name,
+                },
+                "optionInfo":{
+                    "optionSimple": simple_options,
+                },
+                "minorPurchasable": True,
+                "productInfoProvidedNotice":{
+                    "productInfoProvidedNoticeType": product_info_summary_payload
+                }
             },
-            "originAreaInfo" : {
-                "originAreaCode": "02",
-                "importer": brand_name,
+            "smartstoreChannelProduct":{
+                "naverShoppingRegistration":True,
+                "channelProductDisplayStatusType":"ON"
             },
-            "optionInfo":{
-                "optionSimple": simple_options,
-            },
-            "minorPurchasable": True,
-            "productInfoProvidedNotice":{
-                "productInfoProvidedNoticeType": ""
-            }
-
         }
 
         # API 호출
