@@ -1,8 +1,8 @@
+from secret_env.auth_env import auth_info
 import streamlit as st
+from datetime import datetime
 from auth.auth_manager import AuthManager
 from api.api_handler import APIHandler
-from secrets.auth_env import auth_info
-from datetime import datetime
 from data.summary_info_options import summary_info_options
 
 # 페이지 설정
@@ -34,21 +34,21 @@ with st.form("product_form"):
     product_stock = st.number_input("재고 수량 (필수)", min_value=1, step=1, help="상품의 재고 수량을 입력하세요.")
     product_detail = st.text_area("상품 상세 정보 (필수)", help="상품의 상세 설명을 입력하세요.")
     # 옵션정보정보정보
-    with st.form("option_form"):
-        # 단독형 옵션
-        simple_options = []
-        option_count = st.selectbox("단독형 옵션 개수 (1-3)", options=[1, 2, 3], index=0, help="사용할 단독형 옵션의 개수를 선택하세요.")
-        for i in range(option_count):  # 사용자가 선택한 개수만큼 단독형 옵션
-            col1, col2 = st.columns(2)
-            with col1:
-                group_name = st.text_input(f"단독형 옵션 그룹명 {i+1}", help="옵션 그룹명을 입력하세요.")
-            with col2:
-                option_name = st.text_input(f"단독형 옵션값 {i+1}", help="옵션 값을 입력하세요.")
-            if group_name and option_name:
-                simple_options.append({
-                    "groupName": group_name,
-                    "name": option_name,
-                })
+
+    # 단독형 옵션
+    simple_options = []
+    option_count = st.selectbox("단독형 옵션 개수 (1-3)", options=[1, 2, 3], index=0, help="사용할 단독형 옵션의 개수를 선택하세요.")
+    for i in range(option_count):  # 사용자가 선택한 개수만큼 단독형 옵션
+        col1, col2 = st.columns(2)
+        with col1:
+            group_name = st.text_input(f"단독형 옵션 그룹명 {i+1}", help="옵션 그룹명을 입력하세요.")
+        with col2:
+            option_name = st.text_input(f"단독형 옵션값 {i+1}", help="옵션 값을 입력하세요.")
+        if group_name and option_name:
+            simple_options.append({
+                "groupName": group_name,
+                "name": option_name,
+            })
 
     # 폼 제출 버튼
     submit_options = st.form_submit_button("옵션 등록")

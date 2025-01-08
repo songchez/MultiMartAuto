@@ -1,7 +1,7 @@
 import streamlit as st
 from auth.auth_manager import AuthManager
 from api.api_handler import APIHandler
-from secrets.auth_env import auth_info
+from secret_env.auth_env import auth_info
 from datetime import datetime
 import requests
 from PIL import Image
